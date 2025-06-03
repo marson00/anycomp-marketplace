@@ -8,6 +8,8 @@ import com.anycomp.marketplace.repository.BuyerRepository;
 import com.anycomp.marketplace.repository.PurchaseRepository;
 import com.anycomp.marketplace.service.BuyerService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,11 +23,14 @@ public class BuyerServiceImpl implements BuyerService {
     private final BuyerMapper buyerMapper;
 
     @Override
-    public List<BuyerResponse> findAll() {
-        return buyerRepository.findAll()
-                .stream()
-                .map(buyerMapper::toResponse)
-                .collect(Collectors.toList());
+    public Page<BuyerResponse> findAll(Pageable pageable) {
+//        return buyerRepository.findAll()
+//                .stream()
+//                .map(buyerMapper::toResponse)
+//                .collect(Collectors.toList());
+
+        return buyerRepository.findAll(pageable)
+                .map(buyerMapper::toResponse);
     }
 
     @Override

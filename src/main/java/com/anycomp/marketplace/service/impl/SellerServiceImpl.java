@@ -7,8 +7,9 @@ import com.anycomp.marketplace.mapper.SellerMapper;
 import com.anycomp.marketplace.repository.SellerRepository;
 import com.anycomp.marketplace.service.SellerService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.resource.ResourceUrlProvider;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,11 +22,14 @@ public class SellerServiceImpl implements SellerService {
     private final SellerMapper sellerMapper;
 
     @Override
-    public List<SellerResponse> findAll() {
-        return sellerRepository.findAll()
-                .stream()
-                .map(sellerMapper::toResponse)
-                .collect(Collectors.toList());
+    public Page<SellerResponse> findAll(Pageable pageable) {
+//        return sellerRepository.findAll()
+//                .stream()
+//                .map(sellerMapper::toResponse)
+//                .collect(Collectors.toList());
+
+        return sellerRepository.findAll(pageable)
+                .map(sellerMapper::toResponse);
     }
 
     @Override

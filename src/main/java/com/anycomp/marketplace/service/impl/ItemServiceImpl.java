@@ -8,6 +8,8 @@ import com.anycomp.marketplace.repository.ItemRepository;
 import com.anycomp.marketplace.repository.SellerRepository;
 import com.anycomp.marketplace.service.ItemService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,11 +23,14 @@ public class ItemServiceImpl implements ItemService {
     private final ItemMapper itemMapper;
 
     @Override
-    public List<ItemDto> findAll() {
-        return itemRepository.findAll()
-                .stream()
-                .map(itemMapper::toResponse)
-                .toList();
+    public Page<ItemDto> findAll(Pageable pageable) {
+//        return itemRepository.findAll()
+//                .stream()
+//                .map(itemMapper::toResponse)
+//                .toList();
+
+        return itemRepository.findAll(pageable)
+                .map(itemMapper::toResponse);
     }
 
     @Override

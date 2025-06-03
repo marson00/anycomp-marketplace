@@ -4,6 +4,10 @@ import com.anycomp.marketplace.dto.ItemDto;
 import com.anycomp.marketplace.entity.Item;
 import com.anycomp.marketplace.service.ItemService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,8 +19,16 @@ public class ItemController {
     private final ItemService itemService;
 
     @GetMapping("/items")
-    public List<ItemDto> getAllItems() {
-        return itemService.findAll();
+    public Page<ItemDto> getAllItems(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortOrder) {
+        Sort sort = sortOrder.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        return itemService.findAll(pageable);
     }
 
     @GetMapping("/items/{id}")

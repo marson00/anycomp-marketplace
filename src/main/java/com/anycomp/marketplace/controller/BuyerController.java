@@ -5,6 +5,10 @@ import com.anycomp.marketplace.dto.BuyerResponse;
 import com.anycomp.marketplace.entity.Buyer;
 import com.anycomp.marketplace.service.BuyerService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,8 +22,16 @@ public class BuyerController {
     private final BuyerService buyerService;
 
     @GetMapping
-    public List<BuyerResponse> getAllBuyers() {
-        return buyerService.findAll();
+    public Page<BuyerResponse> getAllBuyers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortOrder) {
+        Sort sort = sortOrder.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        return buyerService.findAll(pageable);
     }
 
     @GetMapping("/{id}")

@@ -2,9 +2,12 @@ package com.anycomp.marketplace.controller;
 
 import com.anycomp.marketplace.dto.SellerRequest;
 import com.anycomp.marketplace.dto.SellerResponse;
-import com.anycomp.marketplace.entity.Seller;
 import com.anycomp.marketplace.service.SellerService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,8 +20,16 @@ public class SellerController {
     private final SellerService sellerService;
 
     @GetMapping
-    public List<SellerResponse> getAllSellers() {
-        return sellerService.findAll();
+    public Page<SellerResponse> getAllSellers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortOrder) {
+        Sort sort = sortOrder.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        return sellerService.findAll(pageable);
     }
 
     @GetMapping("/{id}")
