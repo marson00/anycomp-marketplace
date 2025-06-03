@@ -1,0 +1,99 @@
+package com.anycomp.marketplace.service.impl;
+
+import com.anycomp.marketplace.dto.ItemDto;
+import com.anycomp.marketplace.entity.Item;
+import com.anycomp.marketplace.entity.Seller;
+import com.anycomp.marketplace.repository.ItemRepository;
+import com.anycomp.marketplace.repository.SellerRepository;
+import com.anycomp.marketplace.service.ItemService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class ItemServiceImpl implements ItemService {
+
+    private final ItemRepository itemRepository;
+    private final SellerRepository sellerRepository;
+
+    private ItemDto mapToDto(Item item) {
+        ItemDto dto = new ItemDto();
+        dto.setId(item.getId());
+        dto.setName(item.getName());
+        dto.setDescription(item.getDescription());
+        dto.setPrice(item.getPrice());
+        dto.setQuantity(item.getQuantity());
+        dto.setSellerId(item.getSeller().getId());
+
+        return dto;
+    }
+
+    @Override
+    public List<ItemDto> findAll() {
+        return itemRepository.findAll()
+                .stream()
+                .map(this::mapToDto)
+                .toList();
+    }
+
+    @Override
+    public ItemDto findById(Long id) {
+        Item item = itemRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Item ID " + id + " Not Found"));
+
+        return mapToDto(item);
+    }
+
+    @Override
+    public List<ItemDto> getSellerItems(Long sellerId) {
+        return itemRepository.findAll()
+                .stream()
+                .filter(item -> item.getSeller().getId().equals(sellerId))
+                .map(this::mapToDto)
+                .toList();
+    }
+
+    @Override
+    public ItemDto addSellerItem(Long sellerId, Item item) {
+        Seller seller = sellerRepository.findById(sellerId)
+                .orElseThrow(() -> new RuntimeException("Seller ID " + sellerId + " Not Found"));
+
+        item.setSeller(seller);
+        Item savedItem = itemRepository.save(item);
+
+        return mapToDto(savedItem);
+    }
+
+    @Override
+    public ItemDto update(Long id, Item item) {
+        Item existingItem = itemRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Item ID " + id + " Not Found"));
+
+        existingItem.setName(item.getName());
+        existingItem.setDescription(item.getDescription());
+        existingItem.setPrice(item.getPrice());
+        existingItem.setQuantity(item.getQuantity());
+
+        if (item.getSeller() != null && (existingItem.getSeller() == null
+                || !existingItem.getSeller().getId().equals(item.getSeller().getId()))) {
+
+            Long newSellerId = item.getSeller().getId();
+            Seller newSeller = sellerRepository.findById(newSellerId)
+                    .orElseThrow(() -> new RuntimeException("Seller ID " + newSellerId + " not found"));
+            existingItem.setSeller(newSeller);
+        }
+
+        Item updatedItem = itemRepository.save(existingItem);
+        return mapToDto(updatedItem);
+    }
+
+    @Override
+    public void delete(Long id) {
+        Item item = itemRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Item ID " + id + " Not Found"));
+
+        itemRepository.deleteById(id);
+    }
+}
