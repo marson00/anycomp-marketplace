@@ -1,15 +1,16 @@
 package com.anycomp.marketplace.service.impl;
 
 import com.anycomp.marketplace.dto.PurchaseRequest;
+import com.anycomp.marketplace.dto.PurchaseResponse;
 import com.anycomp.marketplace.entity.Buyer;
 import com.anycomp.marketplace.entity.Item;
 import com.anycomp.marketplace.entity.Purchase;
+import com.anycomp.marketplace.mapper.PurchaseMapper;
 import com.anycomp.marketplace.repository.BuyerRepository;
 import com.anycomp.marketplace.repository.ItemRepository;
 import com.anycomp.marketplace.repository.PurchaseRepository;
 import com.anycomp.marketplace.service.PurchaseService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,8 +20,9 @@ public class PurchaseServiceImpl implements PurchaseService {
     private final PurchaseRepository purchaseRepository;
     private final BuyerRepository buyerRepository;
     private final ItemRepository itemRepository;
+    private final PurchaseMapper purchaseMapper;
 
-    public void createPurchase(PurchaseRequest request) {
+    public PurchaseResponse createPurchase(PurchaseRequest request) {
         Buyer buyer = buyerRepository.findById(request.getBuyerId())
                 .orElseThrow(() -> new RuntimeException("Buyer ID " + request.getBuyerId() + " not found"));
         Item item = itemRepository.findById(request.getItemId())
@@ -41,5 +43,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         purchase.setQuantity(request.getQuantity());
 
         purchaseRepository.save(purchase);
+
+        return purchaseMapper.toResponse(purchase);
     }
 }

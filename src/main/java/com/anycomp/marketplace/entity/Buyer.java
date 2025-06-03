@@ -17,6 +17,5 @@ public class Buyer {
     private String email;
 
     @OneToMany(mappedBy = "buyer", cascade = CascadeType.ALL)
-    @JsonManagedReference
     private List<Purchase> purchasedItems;
 }

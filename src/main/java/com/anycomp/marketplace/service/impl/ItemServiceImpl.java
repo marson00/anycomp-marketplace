@@ -3,6 +3,7 @@ package com.anycomp.marketplace.service.impl;
 import com.anycomp.marketplace.dto.ItemDto;
 import com.anycomp.marketplace.entity.Item;
 import com.anycomp.marketplace.entity.Seller;
+import com.anycomp.marketplace.mapper.ItemMapper;
 import com.anycomp.marketplace.repository.ItemRepository;
 import com.anycomp.marketplace.repository.SellerRepository;
 import com.anycomp.marketplace.service.ItemService;
@@ -17,24 +18,13 @@ public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository itemRepository;
     private final SellerRepository sellerRepository;
-
-    private ItemDto mapToDto(Item item) {
-        ItemDto dto = new ItemDto();
-        dto.setId(item.getId());
-        dto.setName(item.getName());
-        dto.setDescription(item.getDescription());
-        dto.setPrice(item.getPrice());
-        dto.setQuantity(item.getQuantity());
-        dto.setSellerId(item.getSeller().getId());
-
-        return dto;
-    }
+    private final ItemMapper itemMapper;
 
     @Override
     public List<ItemDto> findAll() {
         return itemRepository.findAll()
                 .stream()
-                .map(this::mapToDto)
+                .map(itemMapper::toResponse)
                 .toList();
     }
 
@@ -43,7 +33,7 @@ public class ItemServiceImpl implements ItemService {
         Item item = itemRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Item ID " + id + " Not Found"));
 
-        return mapToDto(item);
+        return itemMapper.toResponse(item);
     }
 
     @Override
@@ -51,7 +41,7 @@ public class ItemServiceImpl implements ItemService {
         return itemRepository.findAll()
                 .stream()
                 .filter(item -> item.getSeller().getId().equals(sellerId))
-                .map(this::mapToDto)
+                .map(itemMapper::toResponse)
                 .toList();
     }
 
@@ -63,7 +53,7 @@ public class ItemServiceImpl implements ItemService {
         item.setSeller(seller);
         Item savedItem = itemRepository.save(item);
 
-        return mapToDto(savedItem);
+        return itemMapper.toResponse(savedItem);
     }
 
     @Override
@@ -86,7 +76,7 @@ public class ItemServiceImpl implements ItemService {
         }
 
         Item updatedItem = itemRepository.save(existingItem);
-        return mapToDto(updatedItem);
+        return itemMapper.toResponse(updatedItem);
     }
 
     @Override

@@ -1,5 +1,7 @@
 package com.anycomp.marketplace.controller;
 
+import com.anycomp.marketplace.dto.SellerRequest;
+import com.anycomp.marketplace.dto.SellerResponse;
 import com.anycomp.marketplace.entity.Seller;
 import com.anycomp.marketplace.service.SellerService;
 import lombok.RequiredArgsConstructor;
@@ -15,22 +17,22 @@ public class SellerController {
     private final SellerService sellerService;
 
     @GetMapping
-    public List<Seller> getAllSellers() {
+    public List<SellerResponse> getAllSellers() {
         return sellerService.findAll();
     }
 
     @GetMapping("/{id}")
-    public Seller getSellerById(@PathVariable Long id) {
+    public SellerResponse getSellerById(@PathVariable Long id) {
         return sellerService.findById(id);
     }
 
     @PostMapping
-    public Seller createSeller(@RequestBody Seller seller) {
+    public SellerResponse createSeller(@RequestBody SellerRequest seller) {
         return sellerService.save(seller);
     }
 
     @PutMapping("/{id}")
-    public Seller updateSeller(@PathVariable Long id, @RequestBody Seller seller) {
+    public SellerResponse updateSeller(@PathVariable Long id, @RequestBody SellerRequest seller) {
         return sellerService.update(id, seller);
     }
 

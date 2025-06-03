@@ -1,6 +1,7 @@
 package com.anycomp.marketplace.controller;
 
 import com.anycomp.marketplace.dto.PurchaseRequest;
+import com.anycomp.marketplace.dto.PurchaseResponse;
 import com.anycomp.marketplace.entity.Purchase;
 import com.anycomp.marketplace.service.PurchaseService;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +18,7 @@ public class PurchaseController {
     private final PurchaseService purchaseService;
 
     @PostMapping
-    public void purchase(@RequestBody PurchaseRequest request) {
-        purchaseService.createPurchase(request);
+    public PurchaseResponse purchase(@RequestBody PurchaseRequest request) {
+        return purchaseService.createPurchase(request);
     }
 }

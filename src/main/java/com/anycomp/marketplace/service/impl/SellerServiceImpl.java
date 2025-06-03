@@ -1,6 +1,9 @@
 package com.anycomp.marketplace.service.impl;
 
+import com.anycomp.marketplace.dto.SellerRequest;
+import com.anycomp.marketplace.dto.SellerResponse;
 import com.anycomp.marketplace.entity.Seller;
+import com.anycomp.marketplace.mapper.SellerMapper;
 import com.anycomp.marketplace.repository.SellerRepository;
 import com.anycomp.marketplace.service.SellerService;
 import lombok.RequiredArgsConstructor;
@@ -8,39 +11,50 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.resource.ResourceUrlProvider;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class SellerServiceImpl implements SellerService {
 
     private final SellerRepository sellerRepository;
-    private final ResourceUrlProvider resourceUrlProvider;
+    private final SellerMapper sellerMapper;
 
     @Override
-    public List<Seller> findAll() {
-        return sellerRepository.findAll();
+    public List<SellerResponse> findAll() {
+        return sellerRepository.findAll()
+                .stream()
+                .map(sellerMapper::toResponse)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public Seller findById(Long id) {
-        return sellerRepository.findById(id)
+    public SellerResponse findById(Long id) {
+        Seller seller = sellerRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Seller ID " + id + " Not Found"));
+
+        return sellerMapper.toResponse(seller);
     }
 
     @Override
-    public Seller save(Seller seller) {
-        return sellerRepository.save(seller);
+    public SellerResponse save(SellerRequest sellerRequest) {
+        Seller seller = sellerMapper.toEntity(sellerRequest);
+        Seller savedSeller = sellerRepository.save(seller);
+
+        return sellerMapper.toResponse(savedSeller);
     }
 
     @Override
-    public Seller update(Long id, Seller seller) {
+    public SellerResponse update(Long id, SellerRequest sellerRequest) {
         Seller existingSeller = sellerRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Seller ID " + id + " Not Found"));
 
-        existingSeller.setName(seller.getName());
-        existingSeller.setEmail(seller.getEmail());
+        existingSeller.setName(sellerRequest.getName());
+        existingSeller.setEmail(sellerRequest.getEmail());
 
-        return sellerRepository.save(existingSeller);
+        Seller updatedSeller = sellerRepository.save(existingSeller);
+
+        return sellerMapper.toResponse(updatedSeller);
     }
 
     @Override

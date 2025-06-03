@@ -18,6 +18,5 @@ public class Item {
 
     @ManyToOne
     @JoinColumn(name = "seller_id")
-    @JsonBackReference
     private Seller seller;
 }
